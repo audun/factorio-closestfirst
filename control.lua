@@ -118,8 +118,7 @@ local function adjust_player_range(player)
    -- game.print("range: " .. logistic.cells[1].construction_radius)
 
    -- Cannot use available_construction_robots here because it often becomes 0 when we need to change range
-   local robot_limit = logistic.robot_limit
-   if logistic and logistic.all_construction_robots > 0 and robot_limit > 0 then
+   if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 then
 
       local grid = player.character.grid
       local limit_area = settings.get_player_settings(player)[d.limit_area_setting].value
@@ -178,6 +177,7 @@ local function adjust_player_range(player)
 
          -- This can return more bots than can be used by the roboports
          local bots = logistic.available_construction_robots
+         local robot_limit = logistic.robot_limit
          -- game.print("robot_limit: " .. robot_limit)
          local cell = logistic.cells[1]
          local charging = cell.charging_robot_count + cell.to_charge_robot_count
