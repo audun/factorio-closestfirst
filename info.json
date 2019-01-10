@@ -4,7 +4,7 @@
     "title": "Closest First",
     "author": "_italics_",
     "contact": "",
-    "homepage": "",
+    "homepage": "https://github.com/audun/factorio-closestfirst",
     "factorio_version": "0.16",
     "dependencies": ["base >= 0.16" ],
     "description": "Forces personal construction bots to build or deconstruct close entities first"
