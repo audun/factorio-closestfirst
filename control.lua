@@ -130,7 +130,7 @@ local function adjust_player_range(player)
       -- game.print(original_range)
       if original_range <= 0 then return end
 
-      local radius = math.min(original_range, settings.global[d.search_area_setting].value)
+      local radius = math.min(original_range, settings.global[d.search_area_setting].value / 2)
       local area = {
          {player.position.x-radius, player.position.y-radius},
          {player.position.x+radius, player.position.y+radius}}
