@@ -21,7 +21,7 @@ data:extend({
          type = "int-setting",
          name = d.limit_area_setting,
          setting_type = "runtime-per-user",
-         default_value = 57,
+         default_value = 0,
          minimum_value = 0,
          order = "c",
       },
