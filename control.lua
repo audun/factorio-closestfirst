@@ -117,10 +117,9 @@ local function adjust_player_range(player)
    -- game.print("available: " .. logistic.available_construction_robots)
    -- game.print("range: " .. logistic.cells[1].construction_radius)
 
-   -- Cannot use available_construction_robots here because it often becomes 0 when we need to change range
-   if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 then
+   local grid = player.character.grid
+   if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
 
-      local grid = player.character.grid
       local limit_area = settings.get_player_settings(player)[d.limit_area_setting].value
       local original_range = 2 * get_original_range(grid)
       if limit_area > 0 then
