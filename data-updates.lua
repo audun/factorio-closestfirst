@@ -14,6 +14,9 @@ for name, eq in pairs(roboports) do
       robocopy.construction_radius = i
       robocopy.name = robocopy.name .. "-reduced-" .. i;
       robocopy.order = d._ORDER
+      if not eq.take_result then
+         robocopy.take_result = eq.name
+      end
       data:extend{robocopy};
    end
 end
