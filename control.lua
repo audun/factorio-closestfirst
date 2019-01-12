@@ -1,11 +1,4 @@
 local d = require("defines")
-local serpent = require("serpent")
-
--- Math
-function dist2(position1, position2)
-   return math.pow(position2.x - position1.x, 2) + math.pow(position2.y - position1.y, 2)
-end
-
 
 -- Getters
 local function get_orig_name(eq)
@@ -111,6 +104,8 @@ local function set_to_desired_range(grid, desired)
    end
 end
 
+-- require 'stdlib/log/logger'
+-- LOGGER = Logger.new("ClosestFirstDev", "fancylog", true, {log_ticks=true} )
 
 local function adjust_player_range(player)
    local logistic = player.character.logistic_network
@@ -130,49 +125,63 @@ local function adjust_player_range(player)
       if original_range <= 0 then return end
 
       local radius = math.min(original_range, settings.global[d.search_area_setting].value / 2)
+      local pos = player.position;
+      local px = pos.x
+      local py = pos.y -- I'm just unrolling everything now...
       local area = {
-         {player.position.x-radius, player.position.y-radius},
-         {player.position.x+radius, player.position.y+radius}}
+         {px-radius, py-radius},
+         {px+radius, py+radius}}
 
       -- Can't see a filter that would allow me to find only ghosts and tiles/entities to be deconstructed
+      -- LOGGER.log("finding entities")
       local entities = player.surface.find_entities(area)
+      -- LOGGER.log("done finding " .. #entities .. " entities")
       -- ghosts = player.surface.find_entities_filtered{area = area, type = "entity-ghost"}
       if next(entities) == nil then
          -- game.print("no entities?")
          set_to_desired_range(grid, original_range)
       else
-         local dists = {}
-
+         -- game.print("entities: " .. #entities)
+         
          -- Not sure if it's faster to get all or to query individually
+         -- Profiling shows that these two queries are extremely fast at least
+         -- LOGGER.log("getting inventories")
          local items_quickbar = player.get_inventory(defines.inventory.player_quickbar).get_contents()
          local items_main = player.get_inventory(defines.inventory.player_main).get_contents()
+         -- LOGGER.log("done getting inventories")
 
+         local buckets = {}
+         local maxn = radius*radius + 1
+         -- plus one because my sleepy brain refuses to think about whether it's necessary or not,
+         -- besides, it's probably not even neccesary to create all these buckets
+         for i=1, maxn do
+            buckets[i] = 0
+         end
+         -- LOGGER.log("filtering and calculating buckets")
+         local force = player.force
          local targets = {}
          for index,entity in pairs(entities) do
-            if entity.to_be_deconstructed(player.force) then
-               table.insert(targets, entity)
-               dists[entity] = dist2(entity.position, player.position)
-            else
-               if entity.type == "entity-ghost" or entity.type == "tile-ghost" then
-                  dists[entity] = dist2(entity.position, player.position)
-                  local has_item = items_main[entity.ghost_name] or items_quickbar[entity.ghost_name]
-                  if has_item then
-                     --    game.print("entity.ghost_name: " .. entity.ghost_name .. ' has_item')
-                     table.insert(targets, entity)
-                     -- else
-                     --    -- game.print("entity.ghost_name: " .. entity.ghost_name .. ' missing_item')
-                  end
+            if entity.to_be_deconstructed(force) then
+               local epos = entity.position
+               local x = epos.x - px
+               local y = epos.y - yy
+               local d = x*x + y*y
+               local bucket = math.ceil(d)
+               buckets[bucket] = buckets[bucket] + 1
+            elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
+               local name = entity.ghost_name
+               if items_main[name] or items_quickbar[name] then
+                  -- what was I saying just a moment ago? copy-paste for the speedwin
+                  local epos = entity.position
+                  local x = epos.x - px
+                  local y = epos.y - py
+                  local d = x*x + y*y
+                  local bucket = math.ceil(d)
+                  buckets[bucket] = buckets[bucket] + 1
                end
             end
          end
-         -- game.print("targets: " .. #targets)
-
-         -- Possible optimization opportunity is to use a partial sort, but I guess table.sort is natively implemented
-         table.sort(targets,
-                    function(a,b)
-                       return dists[a] < dists[b]
-                    end
-         )
+         -- LOGGER.log("done filtering and calculating buckets")
 
          -- This can return more bots than can be used by the roboports
          local bots = logistic.available_construction_robots
@@ -189,19 +198,27 @@ local function adjust_player_range(player)
 --         bots = math.min(logistic.available_construction_robots, robot_limit)
          bots = math.max(bots, 1)
          -- game.print("bots: " .. bots)
-         local desired = original_range * original_range
-         for index,entity in pairs(targets) do
-            if index <= bots then
-               -- game.print(index .. ": " .. entity.entity_name .. " " .. dists[entity])
-               desired = dists[entity]
-            else
+         
+         -- Possible optimization opportunity is to use a partial sort, but I guess table.sort is natively implemented
+         -- table.sort(targets, function(a,b) return dists[a] < dists[b] end)
+
+         -- LOGGER.log("looping buckets")
+         local assigned = 0
+         local desired = original_range
+         for i=1, maxn do
+            assigned = assigned + buckets[i]
+            if assigned >= bots then
+               desired = math.ceil(math.sqrt(i)) + 1
+               -- game.print("assigned: " .. assigned .. " i: " .. i .. " desired: " .. desired)
                break
             end
          end
-         desired = math.ceil(math.sqrt(desired)) + 1
+
          desired = math.min(desired, original_range)
          -- game.print("desired: " .. desired)
+         -- LOGGER.log("setting range")
          set_to_desired_range(grid, desired)
+         -- LOGGER.log("done setting range")
       end
    end
 end
@@ -213,6 +230,8 @@ script.on_event({defines.events.on_tick},
       local update_rate = settings.global[d.update_rate_setting].value
       if update_rate > 0 and game.tick % update_rate == 0
       then
+         -- LOGGER.log("profile set t" .. game.tick)
+         -- LOGGER.log("Tick: " .. game.tick)
          for index,player in pairs(game.connected_players) do
             if player.valid
                and player.connected
@@ -221,6 +240,8 @@ script.on_event({defines.events.on_tick},
                adjust_player_range(player)
             end
          end
+         -- LOGGER.log("done ticking")
+         -- LOGGER.log("profile get t" .. game.tick)
       end
    end
 )
