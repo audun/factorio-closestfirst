@@ -107,7 +107,30 @@ end
 -- require 'stdlib/log/logger'
 -- LOGGER = Logger.new("ClosestFirstDev", "fancylog", true, {log_ticks=true} )
 
-local function adjust_player_range(player)
+local function find_close_entities(player)
+   local logistic = player.character.logistic_network
+   local grid = player.character.grid
+   if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
+      local limit_area = settings.get_player_settings(player)[d.limit_area_setting].value
+      local original_range = 2 * get_original_range(grid)
+      if limit_area > 0 then
+         original_range = math.min(original_range, limit_area)
+      end
+      original_range = original_range / 2
+      if original_range <= 0 then return nil end
+      local radius = math.min(original_range, settings.global[d.search_area_setting].value / 2)
+      local pos = player.position;
+      local px = pos.x
+      local py = pos.y -- I'm just unrolling everything now...
+      local area = {
+         {px-radius, py-radius},
+         {px+radius, py+radius}}
+      return player.surface.find_entities(area)
+   end
+   return nil
+end
+
+local function adjust_player_range(player, entities)
    local logistic = player.character.logistic_network
    -- game.print("available: " .. logistic.available_construction_robots)
    -- game.print("range: " .. logistic.cells[1].construction_radius)
@@ -128,13 +151,7 @@ local function adjust_player_range(player)
       local pos = player.position;
       local px = pos.x
       local py = pos.y -- I'm just unrolling everything now...
-      local area = {
-         {px-radius, py-radius},
-         {px+radius, py+radius}}
 
-      -- Can't see a filter that would allow me to find only ghosts and tiles/entities to be deconstructed
-      -- LOGGER.log("finding entities")
-      local entities = player.surface.find_entities(area)
       -- LOGGER.log("done finding " .. #entities .. " entities")
       -- ghosts = player.surface.find_entities_filtered{area = area, type = "entity-ghost"}
       if next(entities) == nil then
@@ -151,33 +168,45 @@ local function adjust_player_range(player)
          -- LOGGER.log("done getting inventories")
 
          local buckets = {}
-         local maxn = radius*radius + 1
-         -- plus one because my sleepy brain refuses to think about whether it's necessary or not,
-         -- besides, it's probably not even neccesary to create all these buckets
-         for i=1, maxn do
-            buckets[i] = 0
-         end
+         local maxn = 0
          -- LOGGER.log("filtering and calculating buckets")
          local force = player.force
          local targets = {}
          for index,entity in pairs(entities) do
-            if entity.to_be_deconstructed(force) then
-               local epos = entity.position
-               local x = epos.x - px
-               local y = epos.y - yy
-               local d = x*x + y*y
-               local bucket = math.ceil(d)
-               buckets[bucket] = buckets[bucket] + 1
-            elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
-               local name = entity.ghost_name
-               if items_main[name] or items_quickbar[name] then
-                  -- what was I saying just a moment ago? copy-paste for the speedwin
-                  local epos = entity.position
-                  local x = epos.x - px
-                  local y = epos.y - py
-                  local d = x*x + y*y
-                  local bucket = math.ceil(d)
-                  buckets[bucket] = buckets[bucket] + 1
+            if entity.valid then
+               if entity.to_be_deconstructed(force) then
+                  -- Copypaste begin
+                     local epos = entity.position
+                     local x = epos.x - px
+                     local y = epos.y - py
+                     local d = x*x + y*y
+                     local bucket = math.ceil(d)
+                     if buckets[bucket] == nil then
+                        buckets[bucket] = 0
+                     end
+                     buckets[bucket] = buckets[bucket] + 1
+                     if bucket > maxn then
+                        maxn = bucket
+                     end
+                  -- Copypaste end
+               elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
+                  local name = entity.ghost_name
+                  if items_main[name] or items_quickbar[name] then
+                     -- Copypaste begin
+                     local epos = entity.position
+                     local x = epos.x - px
+                     local y = epos.y - py
+                     local d = x*x + y*y
+                     local bucket = math.ceil(d)
+                     if buckets[bucket] == nil then
+                        buckets[bucket] = 0
+                     end
+                     buckets[bucket] = buckets[bucket] + 1
+                     if bucket > maxn then
+                        maxn = bucket
+                     end
+                     -- Copypaste end
+                  end
                end
             end
          end
@@ -206,11 +235,13 @@ local function adjust_player_range(player)
          local assigned = 0
          local desired = original_range
          for i=1, maxn do
-            assigned = assigned + buckets[i]
-            if assigned >= bots then
-               desired = math.ceil(math.sqrt(i)) + 1
-               -- game.print("assigned: " .. assigned .. " i: " .. i .. " desired: " .. desired)
-               break
+            if buckets[i] ~= nil then
+               assigned = assigned + buckets[i]
+               if assigned >= bots then
+                  desired = math.ceil(math.sqrt(i)) + 1
+                  -- game.print("assigned: " .. assigned .. " i: " .. i .. " desired: " .. desired)
+                  break
+               end
             end
          end
 
@@ -223,25 +254,51 @@ local function adjust_player_range(player)
    end
 end
 
+script.on_init(
+   function()
+      global.close_entities = {}
+   end
+)
+
+
 script.on_event({defines.events.on_tick},
    function (e)
       -- Disable if update_rate_setting is 0.
       -- TODO: Perhaps a settings changed event could let us restore the original roboports?
       local update_rate = settings.global[d.update_rate_setting].value
-      if update_rate > 0 and game.tick % update_rate == 0
-      then
-         -- LOGGER.log("profile set t" .. game.tick)
-         -- LOGGER.log("Tick: " .. game.tick)
+      if update_rate > 0 then
+         -- TBD: each player gets his own tick
+         -- local valid_players = 0
+         -- for index,player in pairs(game.connected_players) do
+         --       if player.valid and player.connected and player.character then
+         --       end
+         -- end
+         update_rate = math.max(update_rate, 2) -- minimum 2
          for index,player in pairs(game.connected_players) do
             if player.valid
                and player.connected
                and player.character
             then
-               adjust_player_range(player)
+               if game.tick % update_rate == 0 then
+                  -- LOGGER.log("profile set t" .. game.tick)
+                  -- LOGGER.log("Tick: " .. game.tick)
+                  if global.close_entities == nil then
+                     global.close_entities = {} -- This must be wrong..
+                  end
+                  global.close_entities[player.name] = find_close_entities(player)
+                  -- LOGGER.log("done ticking")
+                  -- LOGGER.log("profile get t" .. game.tick)
+               elseif (game.tick + 1) % update_rate == 0 then
+                  if global.close_entities == nil then
+                     global.close_entities = {} -- This must be wrong..
+                  end
+                  local close_entities = global.close_entities[player.name]
+                  if close_entities ~= nil then
+                     adjust_player_range(player, close_entities)
+                  end
+               end
             end
          end
-         -- LOGGER.log("done ticking")
-         -- LOGGER.log("profile get t" .. game.tick)
       end
    end
 )
