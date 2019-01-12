@@ -1,3 +1,9 @@
+Version: 0.1.3
+Date: 2018-01-12
+  Massive performance boost:
+   - Avoid slow player.force call
+   - Use buckets instead of sorting
+   - Split the tasks of finding entities and processing them into separate ticks
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: 2018-01-11
