@@ -1,11 +1,11 @@
 {
     "name": "ClosestFirst",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "title": "Closest First",
     "author": "_italics_",
     "contact": "",
     "homepage": "https://github.com/audun/factorio-closestfirst",
     "factorio_version": "0.16",
     "dependencies": ["base >= 0.16" ],
-    "description": "Lets personal construction bots build or deconstruct close entities first"
+    "description": "Lets personal construction bots save energy and time by building and deconstructing close things first"
 }
