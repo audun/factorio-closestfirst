@@ -1,12 +1,12 @@
 # Closest First
 
-Dynamically adjust personal roboport range to send construction bots from the player's inventory to the nearest ghosts instead of a kind of random ghost in range.
+Automatically adjusts personal roboport range to send construction bots from the player's inventory to the nearest ghosts instead of a kind of random ghost in range.
 
 Works by scanning the surrounding area looking for constructible entities and finding the closest that satisfies the number of available bots. For performance, scanning and range calculations are done in separate ticks, and for only one player at a time in multiplayer. (I have never played multiplayer, so I don't know if it works. If you do, let me know how it goes)
 
 The performance sensitive settings are for admins only so that a mischievous player cannot set it them to more than the server can handle.
 
-If there are performance problems, you can turn off the dynamic updates entirely and use a fixed small max range setting, or the Adjustable-Personal-Roboport-Range mod which does the same with some shortcuts.
+If there are performance problems, you can use the manual Adjustable-Personal-Roboport-Range mod.
 
 Idea and implementation tricks from ProfoundDisputes' brilliant Adjustable-Personal-Roboport-Range roboport swapping and Folk's Stop That, Silly Robot!.
 
