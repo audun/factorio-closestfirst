@@ -111,14 +111,14 @@ local function find_close_entities(player)
    local logistic = player.character.logistic_network
    local grid = player.character.grid
    if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
-      local limit_area = settings.get_player_settings(player)[d.limit_area_setting].value
+      local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
       local original_range = 2 * get_original_range(grid)
       if limit_area > 0 then
          original_range = math.min(original_range, limit_area)
       end
       original_range = original_range / 2
       if original_range <= 0 then return nil end
-      local radius = math.min(original_range, settings.global[d.search_area_setting].value / 2)
+      local radius = math.min(original_range, d.range_setting_table[settings.global[d.search_area_setting].value] / 2)
       local pos = player.position;
       local px = pos.x
       local py = pos.y -- I'm just unrolling everything now...
@@ -138,7 +138,7 @@ local function adjust_player_range(player, entities)
    local grid = player.character.grid
    if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
 
-      local limit_area = settings.get_player_settings(player)[d.limit_area_setting].value
+      local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
       local original_range = 2 * get_original_range(grid)
       if limit_area > 0 then
          original_range = math.min(original_range, limit_area)
@@ -147,7 +147,6 @@ local function adjust_player_range(player, entities)
       -- game.print(original_range)
       if original_range <= 0 then return end
 
-      local radius = math.min(original_range, settings.global[d.search_area_setting].value / 2)
       local pos = player.position;
       local px = pos.x
       local py = pos.y -- I'm just unrolling everything now...
@@ -262,12 +261,16 @@ script.on_init(
 
 script.on_event({defines.events.on_tick},
    function (e)
-      -- Disable if update_rate_setting is 0.
       -- TODO: Perhaps a settings changed event could let us restore the original roboports?
-      local update_rate = settings.global[d.update_rate_setting].value
-      local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at % 60 etc.
-      if update_rate > 0 then
-         -- TBD: each player gets his own tick
+      local update_rate_str = settings.global[d.update_rate_setting].value
+      if update_rate_str ~= "Off" then
+         if update_rate_str == "Fastest" then update_rate = 2
+         elseif update_rate_str == "Faster" then update_rate = 10
+         elseif update_rate_str == "Fast" then update_rate = 30
+         elseif update_rate_str == "Normal"  then update_rate = 60
+         elseif update_rate_str == "Slow" then update_rate = 120
+         end
+
          local valid_players = 0
          for index,player in pairs(game.connected_players) do
             if player.valid and player.connected and player.character then
@@ -275,6 +278,7 @@ script.on_event({defines.events.on_tick},
             end
          end
          update_rate = math.max(update_rate, valid_players * 2) -- minimum 2 ticks per player
+         local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at % 60 etc.
          for index,player in pairs(game.connected_players) do
             if player.valid and player.connected and player.character then
                if (game.tick + tick_offset + 1)  % (update_rate + index) == 0 then
