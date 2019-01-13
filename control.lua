@@ -277,14 +277,14 @@ script.on_event({defines.events.on_tick},
          update_rate = math.max(update_rate, valid_players * 2) -- minimum 2 ticks per player
          for index,player in pairs(game.connected_players) do
             if player.valid and player.connected and player.character then
-               if (game.tick + tick_offset)  % (update_rate + index) == 0 then
+               if (game.tick + tick_offset + 1)  % (update_rate + index) == 0 then
                   -- LOGGER.log("profile set t" .. game.tick)
                   -- LOGGER.log("Tick: " .. game.tick)
                   if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   global.close_entities[player.name] = find_close_entities(player)
                   -- LOGGER.log("done ticking")
                   -- LOGGER.log("profile get t" .. game.tick)
-               elseif (game.tick + tick_offset + 1) % (update_rate + index) == 0 then
+               elseif (game.tick + tick_offset) % (update_rate + index) == 0 then
                   if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   local close_entities = global.close_entities[player.name]
                   if close_entities ~= nil then
