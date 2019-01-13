@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.1.3
+VERSION=`grep \"version\" info.json | cut -f2 -d: | sed 's/[\", ]//g'`
 
 mkdir -p ClosestFirst_$VERSION
 cp -prv info.json *.lua locale *.txt *.md ClosestFirst_$VERSION/
