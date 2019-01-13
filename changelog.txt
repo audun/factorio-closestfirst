@@ -1,17 +1,25 @@
+Version: 0.1.4
+Date: 2018-01-12
+  Performance:
+    - Only one task per player per tick in multiplayer
+  Documentation / UX:
+    - Updated readme
+    - User-friendly settings
+---------------------------------------------------------------------------------------------------
 Version: 0.1.3
 Date: 2018-01-12
   Massive performance boost:
-   - Avoid slow player.force call
-   - Use buckets instead of sorting
-   - Split the tasks of finding entities and processing them into separate ticks
+    - Avoid slow player.force call
+    - Use buckets instead of sorting
+    - Split the tasks of finding entities and processing them into separate ticks
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: 2018-01-11
   Compatibility fix:
     - Creative Mode Fix v0.0.32
   Bugfixes:
-   - Don't try to search the equipment grid if there isn't any
-   - Search area setting was interpreted twice as large as intended (radius instead of area)
+    - Don't try to search the equipment grid if there isn't any
+    - Search area setting was interpreted twice as large as intended (radius instead of area)
   
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
