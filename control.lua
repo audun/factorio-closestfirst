@@ -279,16 +279,18 @@ script.on_event({defines.events.on_tick},
          end
          update_rate = math.max(update_rate, valid_players * 2) -- minimum 2 ticks per player
          local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at % 60 etc.
+         local valid_index = 0
          for index,player in pairs(game.connected_players) do
             if player.valid and player.connected and player.character then
-               if (game.tick + tick_offset + 1)  % (update_rate + index) == 0 then
+               valid_index = valid_index + 1
+               if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
                   -- LOGGER.log("profile set t" .. game.tick)
                   -- LOGGER.log("Tick: " .. game.tick)
                   if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   global.close_entities[player.name] = find_close_entities(player)
                   -- LOGGER.log("done ticking")
                   -- LOGGER.log("profile get t" .. game.tick)
-               elseif (game.tick + tick_offset) % (update_rate + index) == 0 then
+               elseif (game.tick + tick_offset + valid_index) % update_rate == 0 then
                   if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   local close_entities = global.close_entities[player.name]
                   if close_entities ~= nil then
