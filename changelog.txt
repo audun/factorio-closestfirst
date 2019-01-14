@@ -1,3 +1,8 @@
+Version: 0.1.5
+Date: 2018-01-12
+  Bugfix:
+    - Updates should now happen equally often for all players
+---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2018-01-12
   Performance:
