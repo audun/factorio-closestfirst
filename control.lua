@@ -125,7 +125,7 @@ local function find_close_entities(player)
       local area = {
          {px-radius, py-radius},
          {px+radius, py+radius}}
-      return player.surface.find_entities(area)
+      return player.surface.find_entities_filtered{area = area, force = {player.force, "neutral"}}
    end
    return nil
 end
