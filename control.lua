@@ -118,7 +118,11 @@ local function find_close_entities(player)
       end
       original_range = original_range / 2
       if original_range <= 0 then return nil end
-      local radius = math.min(original_range, d.range_setting_table[settings.global[d.search_area_setting].value] / 2)
+      local search_area_radius = d.range_setting_table[settings.global[d.search_area_setting].value] / 2;
+      if search_area_radius <= 0 then search_area_radius = original_range end
+
+      -- Search the smallest of the original range and the setting
+      local radius = math.min(original_range, search_area_radius)
       local pos = player.position;
       local px = pos.x
       local py = pos.y -- I'm just unrolling everything now...
