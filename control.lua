@@ -162,8 +162,8 @@ local function adjust_player_range(player, entities)
          -- Not sure if it's faster to get all or to query individually
          -- Profiling shows that these two queries are extremely fast at least
          -- LOGGER.log("getting inventories")
-         local items_quickbar = player.get_inventory(defines.inventory.player_quickbar).get_contents()
-         local items_main = player.get_inventory(defines.inventory.player_main).get_contents()
+         local items_quickbar = player.get_quickbar().get_contents()
+         local items_main = player.get_main_inventory().get_contents()
          -- LOGGER.log("done getting inventories")
 
          local buckets = {}
