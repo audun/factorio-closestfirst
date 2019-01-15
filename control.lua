@@ -259,6 +259,12 @@ script.on_init(
    end
 )
 
+script.on_configuration_changed(
+   function()
+      global.close_entities = {}
+   end
+)
+
 script.on_event({defines.events.on_tick},
    function (e)
       -- TODO: Perhaps a settings changed event could let us restore the original roboports?
@@ -286,12 +292,10 @@ script.on_event({defines.events.on_tick},
                if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
                   -- LOGGER.log("profile set t" .. game.tick)
                   -- LOGGER.log("Tick: " .. game.tick)
-                  if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   global.close_entities[player.name] = find_close_entities(player)
                   -- LOGGER.log("done ticking")
                   -- LOGGER.log("profile get t" .. game.tick)
                elseif (game.tick + tick_offset + valid_index) % update_rate == 0 then
-                  if global.close_entities == nil then global.close_entities = {} end -- This must be the wrong way to do it..
                   local close_entities = global.close_entities[player.name]
                   if close_entities ~= nil then
                      adjust_player_range(player, close_entities)
