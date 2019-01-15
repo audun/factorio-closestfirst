@@ -279,7 +279,7 @@ script.on_event({defines.events.on_tick},
 
          local valid_players = 0
          for index,player in pairs(game.connected_players) do
-            if player.valid and player.connected and player.character then
+            if player.character then
                valid_players = valid_players + 1
             end
          end
@@ -287,7 +287,7 @@ script.on_event({defines.events.on_tick},
          local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at % 60 etc.
          local valid_index = 0
          for index,player in pairs(game.connected_players) do
-            if player.valid and player.connected and player.character then
+            if player.character then
                valid_index = valid_index + 1
                if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
                   -- LOGGER.log("profile set t" .. game.tick)
