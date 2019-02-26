@@ -166,7 +166,6 @@ local function adjust_player_range(player, entities)
          -- Not sure if it's faster to get all or to query individually
          -- Profiling shows that these two queries are extremely fast at least
          -- LOGGER.log("getting inventories")
-         local items_quickbar = player.get_quickbar().get_contents()
          local items_main = player.get_main_inventory().get_contents()
          -- LOGGER.log("done getting inventories")
 
@@ -194,7 +193,7 @@ local function adjust_player_range(player, entities)
                   -- Copypaste end
                elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
                   local name = entity.ghost_name
-                  if items_main[name] or items_quickbar[name] then
+                  if items_main[name] then
                      -- Copypaste begin
                      local epos = entity.position
                      local x = epos.x - px
@@ -222,7 +221,7 @@ local function adjust_player_range(player, entities)
          local cell = logistic.cells[1]
          local charging = cell.charging_robot_count + cell.to_charge_robot_count
          -- game.print("charging: " .. charging)
-         -- local inventory_bots = (items_quickbar["construction-robot"] or 0) + (items_main["construction-robot"] or 0)
+         -- local inventory_bots = (items_main["construction-robot"] or 0)
          -- game.print("inventory_bots: " .. inventory_bots)
 
          -- The construction bots are holding on to tasks while waiting for charging
