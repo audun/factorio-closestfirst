@@ -1,44 +1,58 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.17.2
+Date: 28.02.2019
+  Changes:
+    - Added thumbnail.png for new mod portal
+    - Make the changelog readable in game mod browser too
+---------------------------------------------------------------------------------------------------
+Version: 0.17.1
+Date: 27.02.2019
+  Changes:
+    - Updated for Factorio version 0.17
+---------------------------------------------------------------------------------------------------
 Version: 0.1.7
-Date: 2018-01-15
-  Bugfix:
+Date: 15.01.2019
+  Bugfixes:
     - Using unlimited search area caused a crash
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
-Date: 2018-01-15
-  Performance:
-    - Only find entities belonging to neutral and player's force
-  Minor:
-    - Various API usage improvements based on Bilka's suggestions
+Date: 15.01.2019
+  Changes:
+    - Performance:
+      - Only find entities belonging to neutral and player's force
+      - Various API usage improvements based on Bilka's suggestions
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
-Date: 2018-01-14
-  Bugfix:
+Date: 14.01.2019
+  Bugfixes:
     - Updates should now happen equally often for all players
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
-Date: 2018-01-13
-  Performance:
-    - Only one task per player per tick in multiplayer
-  Documentation / UX:
-    - Updated readme
-    - User-friendly settings
+Date: 13.01.2019
+  Changes:
+    - Performance:
+      - Only one task per player per tick in multiplayer
+    - Documentation / UX:
+      - Updated readme
+      - User-friendly settings
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
-Date: 2018-01-12
-  Massive performance boost:
-    - Avoid slow player.force call
-    - Use buckets instead of sorting
-    - Split the tasks of finding entities and processing them into separate ticks
+Date: 12.01.2019
+  Changes:
+    - Massive performance boost
+      - Avoid slow player.force call
+      - Use buckets instead of sorting
+      - Split the tasks of finding entities and processing them into separate ticks
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
-Date: 2018-01-11
-  Compatibility fix:
-    - Creative Mode Fix v0.0.32
+Date: 11.01.2019
+  Features:
+    - Compatibility with Creative Mode Fix v0.0.32 and other personal roboport mods
   Bugfixes:
     - Don't try to search the equipment grid if there isn't any
     - Search area setting was interpreted twice as large as intended (radius instead of area)
-  
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
-Date: 2018-01-10
-
+Date: 10.01.2019
+  Features:
+    - Initial version.
