@@ -4,7 +4,8 @@ return {
    update_rate_setting = "italics-closestfirst-update_rate_setting",
    limit_area_setting = "italics-closestfirst-limit_area_setting",
    range_setting_table = {
-      ["No limit (up to equipped Roboport range)"] = 0,
+      ["No limit (up to equipped roboport range or player's Max personal roboport area setting)"] = 0,
+      ["No limit (up to equipped roboport range)"] = 0,
       ["10x10"]                     =  10,
       ["20x20"]                     =  20,
       ["30x30 (Roboport Mk1)"]      =  30,

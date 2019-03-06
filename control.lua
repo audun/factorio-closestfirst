@@ -270,56 +270,52 @@ local function adjust_player_range(player, entities)
    end
 end
 
-script.on_init(
-   function()
-      global.close_entities = {}
+local function tick(event)
+   local valid_players = 0
+   for index,player in pairs(game.connected_players) do
+      if player.character then
+         valid_players = valid_players + 1
+      end
    end
-)
-
-script.on_configuration_changed(
-   function()
-      global.close_entities = {}
-   end
-)
-
-script.on_event({defines.events.on_tick},
-   function (e)
-      -- TODO: Perhaps a settings changed event could let us restore the original roboports?
-      local update_rate_str = settings.global[d.update_rate_setting].value
-      if update_rate_str ~= "Off" then
-         if update_rate_str == "Fastest" then update_rate = 2
-         elseif update_rate_str == "Faster" then update_rate = 10
-         elseif update_rate_str == "Fast" then update_rate = 30
-         elseif update_rate_str == "Normal"  then update_rate = 60
-         elseif update_rate_str == "Slow" then update_rate = 120
-         end
-
-         local valid_players = 0
-         for index,player in pairs(game.connected_players) do
-            if player.character then
-               valid_players = valid_players + 1
-            end
-         end
-         update_rate = math.max(update_rate, valid_players * 2) -- minimum 2 ticks per player
-         local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at % 60 etc.
-         local valid_index = 0
-         for index,player in pairs(game.connected_players) do
-            if player.character then
-               valid_index = valid_index + 1
-               if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
-                  -- LOGGER.log("profile set t" .. game.tick)
-                  -- LOGGER.log("Tick: " .. game.tick)
-                  global.close_entities[player.name] = find_close_entities(player)
-                  -- LOGGER.log("done ticking")
-                  -- LOGGER.log("profile get t" .. game.tick)
-               elseif (game.tick + tick_offset + valid_index) % update_rate == 0 then
-                  local close_entities = global.close_entities[player.name]
-                  if close_entities ~= nil then
-                     adjust_player_range(player, close_entities)
-                  end
-               end
+   update_rate = math.max(global.update_rate, valid_players * 2) -- minimum 2 ticks per player
+   local tick_offset = 13 -- just a random prime to attempt avoiding overlap with other mods which does work at regular intervals
+   local valid_index = 0
+   for index,player in pairs(game.connected_players) do
+      if player.character then
+         valid_index = valid_index + 1
+         if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
+            -- LOGGER.log("profile set t" .. game.tick)
+            -- LOGGER.log("Tick: " .. game.tick)
+            global.close_entities[player.name] = find_close_entities(player)
+            -- LOGGER.log("done ticking")
+            -- LOGGER.log("profile get t" .. game.tick)
+         elseif (game.tick + tick_offset + valid_index) % update_rate == 0 then
+            local close_entities = global.close_entities[player.name]
+            if close_entities ~= nil then
+               adjust_player_range(player, close_entities)
             end
          end
       end
    end
-)
+end
+
+local function register_event_handlers()
+   if global.update_rate and global.update_rate > 0 then
+      script.on_event({defines.events.on_tick}, tick)
+   else
+      script.on_event({defines.events.on_tick}, nil)
+   end
+end
+
+local function setup()
+   global.close_entities = {}
+   global.update_rate = d.update_rate_setting_table[settings.global[d.update_rate_setting].value]
+
+   adjust_all_players_to_their_limit()
+   register_event_handlers()
+end
+
+script.on_load(register_event_handlers)
+script.on_event(defines.events.on_runtime_mod_setting_changed, setup)
+script.on_configuration_changed(setup)
+
