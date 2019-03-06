@@ -104,6 +104,20 @@ local function set_to_desired_range(grid, desired)
    end
 end
 
+local function adjust_all_players_to_their_limit()
+   for index,player in pairs(game.connected_players) do
+      c = player.character  
+      if c and c.grid then
+         local limit_range = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value] / 2
+         if limit_range > 0 then
+            set_to_desired_range(c.grid, limit_range)
+         else
+            restore(c.grid)
+         end
+      end
+   end      
+end
+
 -- require 'stdlib/log/logger'
 -- LOGGER = Logger.new("ClosestFirstDev", "fancylog", true, {log_ticks=true} )
 
