@@ -1,34 +1,34 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.17.2
-Date: 28.02.2019
+Date: 2019-02-28
   Changes:
     - Added thumbnail.png for new mod portal
     - Make the changelog readable in game mod browser too
 ---------------------------------------------------------------------------------------------------
 Version: 0.17.1
-Date: 27.02.2019
+Date: 2019-02-27
   Changes:
     - Updated for Factorio version 0.17
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.7
-Date: 15.01.2019
+Date: 2019-01-15
   Bugfixes:
     - Using unlimited search area caused a crash
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
-Date: 15.01.2019
+Date: 2019-01-15
   Changes:
     - Performance:
       - Only find entities belonging to neutral and player's force
       - Various API usage improvements based on Bilka's suggestions
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
-Date: 14.01.2019
+Date: 2019-01-14
   Bugfixes:
     - Updates should now happen equally often for all players
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
-Date: 13.01.2019
+Date: 2019-01-13
   Changes:
     - Performance:
       - Only one task per player per tick in multiplayer
@@ -37,7 +37,7 @@ Date: 13.01.2019
       - User-friendly settings
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
-Date: 12.01.2019
+Date: 2019-01-12
   Changes:
     - Massive performance boost
       - Avoid slow player.force call
@@ -45,7 +45,7 @@ Date: 12.01.2019
       - Split the tasks of finding entities and processing them into separate ticks
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
-Date: 11.01.2019
+Date: 2019-01-11
   Features:
     - Compatibility with Creative Mode Fix v0.0.32 and other personal roboport mods
   Bugfixes:
@@ -53,6 +53,6 @@ Date: 11.01.2019
     - Search area setting was interpreted twice as large as intended (radius instead of area)
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
-Date: 10.01.2019
+Date: 2019-01-10
   Features:
     - Initial version.
