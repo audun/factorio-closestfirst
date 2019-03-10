@@ -21,11 +21,9 @@ return {
    update_rate_setting_table = {
       ["Off"]     =   0,
       ["Fastest"] =   2,
-      ["Faster"]  =   8,
-      ["Fast"]    =  16,
-      ["Normal"]  =  32,
-      ["Slow"]    =  64,
-      ["Slower"]  =  96,
-      ["Slowest"] = 128
+      ["Faster"]  =  16,
+      ["Fast"]    =  32,
+      ["Normal"]  =  64,
+      ["Slow"]    = 128,
    }
 }
