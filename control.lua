@@ -190,7 +190,7 @@ local function adjust_player_range(player, entities)
          local targets = {}
          for index,entity in pairs(entities) do
             if entity.valid then
-               if entity.to_be_deconstructed(force) then
+               if entity.to_be_deconstructed(force) or entity.to_be_upgraded() then
                   -- Copypaste begin
                      local epos = entity.position
                      local x = epos.x - px
