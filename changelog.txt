@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.17.3
+Date: 2019-03-10
+  Features:
+    - Support upgrade planner
+  Performance:
+    - Use configuration events instead of checking settings every tick
+    - Unregister tick handler when in Off-mode, but adjust equipment when settings change so mod can be used with zero performance penalty
+---------------------------------------------------------------------------------------------------
 Version: 0.17.2
 Date: 2019-02-28
   Changes:
