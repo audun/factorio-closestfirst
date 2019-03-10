@@ -1,0 +1,7 @@
+factorio_mod_path = "~/Library/Application Support/factorio/mods"
+factorio_run_path = "~/Library/Application\ Support/Steam/steamapps/common/Factorio/factorio.app/Contents/MacOS/factorio"
+
+# windows based example
+# factorio_run_path = "D:\Spiele\Factorio\bin\x64\factorio.exe"
+
+faketorio_path = "/usr/local/bin/faketorio"
