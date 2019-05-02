@@ -13,8 +13,8 @@ end
 local function get_curr_limit(eq)
    return eq.prototype.logistic_parameters.robot_limit
 end
-local function get_player_range(player)
-   return player.character.logistic_network.cells[1].construction_radius
+local function get_character_range(character)
+   return character.logistic_network.cells[1].construction_radius
 end
 
 local function replace_roboport(grid, old, new_name)
@@ -104,59 +104,87 @@ local function set_to_desired_range(grid, desired)
    end
 end
 
+local function adjust_character_to_limit(c)
+   if c and c.limit and c.grid then
+      local limit_range = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value] / 2
+      if limit_range > 0 then
+         set_to_desired_range(c.grid, limit_range)
+      else
+         restore(c.grid)
+      end
+   end      
+end
+
 local function adjust_all_players_to_their_limit()
    for index,player in pairs(game.connected_players) do
-      c = player.character  
-      if c and c.grid then
-         local limit_range = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value] / 2
-         if limit_range > 0 then
-            set_to_desired_range(c.grid, limit_range)
-         else
-            restore(c.grid)
-         end
-      end
+      adjust_character_to_limit(player.character)
    end      
 end
 
 -- require 'stdlib/log/logger'
 -- LOGGER = Logger.new("ClosestFirstDev", "fancylog", true, {log_ticks=true} )
 
-local function find_close_entities(player)
-   local logistic = player.character.logistic_network
-   local grid = player.character.grid
+local function find_close_entities(character, limit_area, pos, surface, force)
+   if not character or not character.valid then
+      return nil
+   end
+   local logistic = character.logistic_network
+   local grid = character.grid
    if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
-      local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
       local original_range = 2 * get_original_range(grid)
       if limit_area > 0 then
          original_range = math.min(original_range, limit_area)
       end
       original_range = original_range / 2
       if original_range <= 0 then return nil end
-      local search_area_radius = d.range_setting_table[settings.global[d.search_area_setting].value] / 2;
+      local search_area_radius = d.range_setting_table[settings.global[d.search_area_setting].value] / 2
       if search_area_radius <= 0 then search_area_radius = original_range end
 
       -- Search the smallest of the original range and the setting
       local radius = math.min(original_range, search_area_radius)
-      local pos = player.position;
       local px = pos.x
       local py = pos.y -- I'm just unrolling everything now...
       local area = {
          {px-radius, py-radius},
          {px+radius, py+radius}}
-      return player.surface.find_entities_filtered{area = area, force = {player.force, "neutral"}}
+      return surface.find_entities_filtered{area = area, force = {force, "neutral"}}
    end
    return nil
 end
 
+local function find_close_entities_for_player(player)
+   if player and player.valid then
+      local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
+      return find_close_entities(player.character, limit_area, player.position, player.surface, player.force)
+   end
+end
+
 local function adjust_player_range(player, entities)
-   local logistic = player.character.logistic_network
+   if player and player.valid and player.character then
+      local character = player.character
+      local logistic = character.logistic_network
+      if logistic then
+         local grid = character.grid
+         if grid then 
+            local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
+            adjust_character_range(character, entities, logistic, grid,
+         end
+      end
+   end
+end
+
+local function adjust_character_range(character, entities, limit_area)
+   if not character or not character.valid then
+      return nil
+   end
+   
+   local logistic = character.logistic_network
    -- game.print("available: " .. logistic.available_construction_robots)
    -- game.print("range: " .. logistic.cells[1].construction_radius)
 
-   local grid = player.character.grid
+   local grid = character.grid
    if logistic and logistic.all_construction_robots > 0 and logistic.robot_limit > 0 and grid then
-
-      local limit_area = d.range_setting_table[settings.get_player_settings(player)[d.limit_area_setting].value]
+      
       local original_range = 2 * get_original_range(grid)
       if limit_area > 0 then
          original_range = math.min(original_range, limit_area)
@@ -286,7 +314,7 @@ local function tick(event)
          if (game.tick + tick_offset + valid_index + 1) % update_rate == 0 then
             -- LOGGER.log("profile set t" .. game.tick)
             -- LOGGER.log("Tick: " .. game.tick)
-            global.close_entities[player.name] = find_close_entities(player)
+            global.close_entities[player.name] = find_close_entities_for_player(player)
             -- LOGGER.log("done ticking")
             -- LOGGER.log("profile get t" .. game.tick)
          elseif (game.tick + tick_offset + valid_index) % update_rate == 0 then
