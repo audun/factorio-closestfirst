@@ -148,7 +148,7 @@ local function find_close_entities(player)
    return nil
 end
 
-local function player_has_items_that_can_revive_ghost(inventory, ghost_entity)
+local function inventory_has_items_that_can_revive_ghost(inventory, ghost_entity)
 
     local placeable_items = ghost_entity.ghost_prototype.items_to_place_this
     
@@ -219,7 +219,7 @@ local function adjust_player_range(player, entities)
                      end
                   -- Copypaste end
                elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
-                  if player_has_items_that_can_revive_ghost(items_main, entity) then
+                  if inventory_has_items_that_can_revive_ghost(items_main, entity) then
                      -- Copypaste begin
                      local epos = entity.position
                      local x = epos.x - px
