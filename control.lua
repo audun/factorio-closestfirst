@@ -148,6 +148,19 @@ local function find_close_entities(player)
    return nil
 end
 
+local function player_has_items_that_can_revive_ghost(inventory, ghost_entity)
+
+    local placeable_items = ghost_entity.ghost_prototype.items_to_place_this
+    
+    if placeable_items == nil then return false end
+    
+    for _, item in pairs(placeable_items) do
+        if inventory[item.name] ~= nil then return true end
+    end
+
+    return false
+end
+
 local function adjust_player_range(player, entities)
    local logistic = player.character.logistic_network
    -- game.print("available: " .. logistic.available_construction_robots)
@@ -206,8 +219,7 @@ local function adjust_player_range(player, entities)
                      end
                   -- Copypaste end
                elseif entity.type == "entity-ghost" or entity.type == "tile-ghost" then
-                  local name = entity.ghost_name
-                  if items_main[name] then
+                  if player_has_items_that_can_revive_ghost(items_main, entity) then
                      -- Copypaste begin
                      local epos = entity.position
                      local x = epos.x - px
