@@ -8,6 +8,7 @@ mkdir -p $NAME
 cp -prv info.json *.lua locale *.txt *.md thumbnail.png $NAME/
 rm -f $ZIP
 zip -r $ZIP $NAME
-cp $ZIP ~/Library/Application\ Support/factorio/mods/
-cd ~/Library/Application\ Support/factorio/mods/
+mod_directory="$(./get_factorio_mod_directory.sh)"
+cp $ZIP "$mod_directory"
+cd "$mod_directory"
 unzip -o $ZIP
