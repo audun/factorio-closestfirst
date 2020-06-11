@@ -201,6 +201,15 @@ local function adjust_player_range(player, entities)
          -- LOGGER.log("filtering and calculating buckets")
          local force = player.force
          local targets = {}
+         
+         -- Bot capacity modifier is the amount by which to reduce the contribution of each entity
+         -- to its total count in order to attempt to account for batching that can be done by the game.
+         local bot_capacity = 1 + force.worker_robots_storage_bonus
+         local bot_capacity_modifier = 1
+         if bot_capacity > 1 then
+            bot_capacity_modifier = bot_capacity * 0.75
+         end
+         
          for index,entity in pairs(entities) do
             if entity.valid then
                if entity.to_be_deconstructed(force) or entity.to_be_upgraded() then
@@ -229,7 +238,13 @@ local function adjust_player_range(player, entities)
                      if buckets[bucket] == nil then
                         buckets[bucket] = 0
                      end
-                     buckets[bucket] = buckets[bucket] + 1
+                     -- Decrease the increment to allow the range to be bigger, if bots can batch build tasks.
+                     -- Currently batching is only done when placing tiles.
+                     local increment = 1
+                     if entity.type == "tile-ghost" and bot_capacity > 1 then
+                        increment = increment / bot_capacity_modifier
+                     end
+                     buckets[bucket] = buckets[bucket] + increment
                      if bucket > maxn then
                         maxn = bucket
                      end
@@ -264,7 +279,7 @@ local function adjust_player_range(player, entities)
          local desired = original_range
          for i=1, maxn do
             if buckets[i] ~= nil then
-               assigned = assigned + buckets[i]
+               assigned = assigned + math.ceil(buckets[i])
                if assigned >= bots then
                   desired = math.ceil(math.sqrt(i)) + 1
                   -- game.print("assigned: " .. assigned .. " i: " .. i .. " desired: " .. desired)
