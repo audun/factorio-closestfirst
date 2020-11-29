@@ -5,7 +5,7 @@
     "author": "_italics_",
     "contact": "",
     "homepage": "https://github.com/audun/factorio-closestfirst",
-    "factorio_version": "0.18",
+    "factorio_version": "1.1",
     "dependencies": ["base >= 0.16" ],
     "description": "Lets personal construction bots save energy and time by building and deconstructing close things first"
 }
